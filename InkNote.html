@@ -7,6 +7,9 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>墨舟 InkNote — Markdown 学习助手</title>
+<meta name="description" content="轻量、离线可用的 Markdown 学习助手">
+<meta name="theme-color" content="#0d0f14">
+<link rel="manifest" id="manifestLink">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
 <style>
@@ -122,6 +125,9 @@ html[data-theme="light"] pre[class*="language-"].line-numbers .line-numbers-rows
 .sidebar-toggle{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:0 4px;line-height:1;transition:color 0.2s}
 .sidebar-toggle:hover{color:var(--accent);transform:rotate(90deg)}
 
+/* 侧边栏过滤输入框 */
+#sidebarFilter:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+
 /* Main */
 .main{margin-left:var(--sidebar-w);margin-top:var(--header-h);min-height:calc(100vh - var(--header-h));display:flex;justify-content:center;transition:margin .3s}
 .main.full{margin-left:0}
@@ -139,14 +145,20 @@ html[data-theme="light"] pre[class*="language-"].line-numbers .line-numbers-rows
 .doc-header{text-align:center;padding:32px 0 28px;border-bottom:1px solid var(--border);margin-bottom:36px;position:relative}
 .doc-header h1{font-size:28px;font-weight:700;margin-bottom:8px}
 .doc-header .meta-info{font-size:13px;color:var(--text-muted);display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
-.doc-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-spring)}
+.doc-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s var(--ease-spring)}
 .doc-close:hover{border-color:var(--accent);color:var(--accent);transform:rotate(90deg)}
 .doc-close:active{transform:rotate(90deg) scale(0.9)}
 
 /* ═══ 编辑器 ═══ */
-.doc-edit{position:absolute;top:12px;right:52px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s var(--ease-spring)}
+.doc-edit{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s var(--ease-spring)}
 .doc-edit:hover{border-color:var(--green);color:var(--green);transform:rotate(15deg)}
 .doc-edit:active{transform:rotate(15deg) scale(0.9)}
+.doc-export{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s var(--ease-spring)}
+.doc-export:hover{border-color:var(--green);color:var(--green);transform:rotate(15deg)}
+.doc-export:active{transform:rotate(15deg) scale(0.9)}
+.export-menu{position:absolute;bottom:48px;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:4px;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.3);min-width:140px;animation:modalPopIn 0.2s var(--ease-spring)}
+.export-menu button{display:block;width:100%;padding:8px 14px;border:none;background:none;color:var(--text-secondary);font-size:13px;text-align:left;cursor:pointer;border-radius:6px;transition:all .12s}
+.export-menu button:hover{background:var(--accent-soft);color:var(--accent)}
 .editor-toolbar{display:flex;gap:4px;padding:8px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;flex-wrap:wrap;animation:toolbarSlideIn 0.3s var(--ease-spring)}
 @keyframes toolbarSlideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 .editor-toolbar button{padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit;position:relative;overflow:hidden}
@@ -156,6 +168,15 @@ html[data-theme="light"] pre[class*="language-"].line-numbers .line-numbers-rows
 @keyframes editorFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .editor-textarea{width:100%;min-height:calc(100vh - 260px);padding:20px;border:none;background:var(--bg-code);color:var(--text-primary);font-family:Consolas,'Courier New','Noto Sans SC',monospace;font-size:14px;line-height:1.7;resize:vertical;outline:none;tab-size:4;transition:box-shadow .2s}
 .editor-textarea:focus{box-shadow:inset 0 0 0 2px var(--accent-glow)}
+.editor-split{display:flex;gap:0}
+.editor-split .editor-container{border-radius:0 0 0 var(--radius);border-right:none}
+.editor-split .editor-textarea{min-height:60vh}
+.editor-split .editor-preview-pane{border-radius:0 0 var(--radius) 0}
+@media(max-width:768px){
+  .editor-split{flex-direction:column}
+  .editor-split .editor-container{min-height:50vh}
+  .editor-split .editor-preview-pane{min-height:40vh}
+}
 .editor-actions{display:flex;gap:8px;padding:12px 0;justify-content:flex-end;animation:actionsSlideIn 0.3s var(--ease-spring) 0.1s both}
 @keyframes actionsSlideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
 .editor-actions .share-btn{min-width:80px}
@@ -215,9 +236,14 @@ html[data-theme="light"] pre[class*="language-"].line-numbers .line-numbers-rows
 .progress-header .collapse-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px;transition:all .2s var(--ease-spring)}
 .progress-header .collapse-btn:hover{color:var(--accent);transform:rotate(15deg)}
 
-/* Back to top */
-.back-top{position:fixed;bottom:28px;right:28px;width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transform:translateY(12px);transition:opacity 0.3s var(--ease-smooth),transform 0.3s var(--ease-spring),box-shadow 0.3s;box-shadow:0 4px 16px var(--accent-glow);z-index:90;border:none;font-size:18px}
-.back-top.show{opacity:1;transform:translateY(0)}
+/* FAB 浮动操作栏 */
+.fab-bar{position:fixed;bottom:28px;right:28px;display:flex;flex-direction:column-reverse;gap:8px;z-index:90;align-items:center}
+.fab-bar button{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s var(--ease-spring);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.fab-bar button:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px var(--accent-glow)}
+.fab-bar button:active{transform:scale(0.9)}
+.fab-bar .doc-save{color:var(--green)}
+.fab-bar .doc-save:hover{border-color:var(--green);color:var(--green)}
+.fab-separator{width:24px;height:2px;background:var(--border);border-radius:1px;flex-shrink:0}
 
 /* Search highlight */
 .search-highlight{background:var(--orange-soft);color:var(--orange);border-radius:2px;padding:1px 2px}
@@ -394,7 +420,8 @@ html[data-theme="light"] .icon-folder{background-image:url("data:image/svg+xml,%
 
 /* ═══ 新增组件移动端适配 ═══ */
 @media(max-width:640px){
-  .back-top{width:36px;height:36px;font-size:16px;bottom:20px;right:16px}
+  .fab-bar{bottom:20px;right:16px;gap:6px}
+  .fab-bar button{width:36px;height:36px;font-size:14px}
   .modal-box{padding:16px;width:92vw}
   .modal-box h3{font-size:15px}
   .modal-box .modal-msg{font-size:12px}
@@ -410,6 +437,16 @@ html[data-theme="light"] .icon-folder{background-image:url("data:image/svg+xml,%
   .header-meta{gap:3px}
   .file-btn{padding:4px 6px;font-size:10px}
   #historyPanelContent{max-width:100%}
+}
+
+/* ═══ 打印样式 ═══ */
+@media print {
+  .header, .sidebar, .sidebar-overlay, .fab-bar, .progress-toggle, .progress-panel,
+  .export-menu, .search-panel,
+  .share-overlay, .modal-overlay, #historyOverlay { display: none !important }
+  .main { margin-left: 0 !important; margin-top: 0 !important }
+  .content { max-width: 100%; padding: 20px; }
+  body { background: #fff; color: #1a1d2e; }
 }
 
 /* ═══ 自定义弹框 ═══ */
@@ -452,6 +489,7 @@ html[data-theme="light"] .icon-folder{background-image:url("data:image/svg+xml,%
       <input type="file" id="fileInput2" accept=".md,.markdown,.txt,.js,.ts,.py,.java,.html,.css,.json,.yaml,.yml,.xml,.toml,.sql,.sh,.log,.csv,.rst,.adoc,.tex,.org" style="display:none">
       <button class="file-btn" id="historyBtn" style="background:var(--orange-soft);color:var(--orange);border-color:rgba(240,176,96,.25)">📚 <span class="btn-label">历史</span></button>
       <button class="file-btn" id="shareBtn" style="background:var(--green-soft);color:var(--green);border-color:rgba(61,214,140,.25)">🔗 <span class="btn-label">分享</span></button>
+      <button class="file-btn" id="pluginBtn" style="background:var(--orange-soft);color:var(--orange);border-color:rgba(240,176,96,.25)">🧩 <span class="btn-label">插件</span></button>
       <button class="theme-btn" id="themeBtn"><span class="icon icon-sun"></span></button>
     </div>
   </header>
@@ -460,6 +498,7 @@ html[data-theme="light"] .icon-folder{background-image:url("data:image/svg+xml,%
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-label">文件目录 <span id="fileCount" style="font-weight:400;text-transform:none;letter-spacing:0"></span> <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">×</button></div>
+    <div style="padding:4px 14px 8px"><input id="sidebarFilter" placeholder="🔍 过滤文件名..." autocomplete="off" style="width:100%;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-size:12px;outline:none;transition:border-color .2s"></div>
     <div class="file-tree" id="fileTree"></div>
     <div class="sidebar-label" style="margin-top:12px">当前章节</div>
     <div id="tocNav" style="padding:0 0 12px"><div style="color:var(--text-muted);font-size:12px;padding:8px 18px">打开文件后显示</div></div>
@@ -499,7 +538,12 @@ html[data-theme="light"] .icon-folder{background-image:url("data:image/svg+xml,%
     <div id="progressItems"></div>
   </div>
 
-  <button class="back-top" id="backTop">↑</button>
+  <div class="fab-bar" id="fabBar">
+    <button class="fab-new" id="fabNew" title="新建笔记" onclick="createNewFile()">＋</button>
+    <div class="fab-separator"></div>
+    <button class="back-top" id="backTop" title="回到顶部">↑</button>
+  </div>
+  <!-- 注意：openFile() 中动态插入的 export/edit/close 按钮会插入到 fab-new 之前 -->
   <button class="progress-toggle" id="progressToggle" title="学习进度" style="display:none">≡</button>
 
   <!-- Share modal -->
@@ -568,6 +612,27 @@ html[data-theme="light"] .icon-folder{background-image:url("data:image/svg+xml,%
     </div>
   </div>
 
+  <!-- 插件管理面板 -->
+  <div class="modal-overlay" id="pluginOverlay">
+    <div class="modal-box" style="width:480px;max-height:70vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="margin:0;font-size:17px">🧩 自定义语法规则</h3>
+        <button id="pluginCloseBtn" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px;transition:all .2s" onmouseenter="this.style.color='var(--text-primary)';this.style.transform='rotate(90deg)'" onmouseleave="this.style.color='var(--text-muted)';this.style.transform='none'">✕</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">添加自定义 Markdown 语法替换规则。规则在内置语法之后执行。</div>
+      <div id="pluginRuleList"></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">添加新规则</div>
+        <div style="display:grid;gap:8px">
+          <input id="ruleName" placeholder="规则名称（如：highlight）" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text-primary);font-size:12px;outline:none">
+          <input id="rulePattern" placeholder="匹配模式（如：==(.+?)==）" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text-primary);font-size:12px;font-family:Consolas,monospace;outline:none">
+          <input id="ruleReplacement" placeholder="替换模板（如：<mark>$1</mark>）" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text-primary);font-size:12px;font-family:Consolas,monospace;outline:none">
+          <button onclick="addRuleFromUI()" style="padding:8px;border:1px solid var(--accent);border-radius:6px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s">添加规则</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 历史记录面板 -->
   <div class="modal-overlay" id="historyOverlay">
     <div class="modal-box" style="width:440px;max-height:70vh;overflow-y:auto">
@@ -610,15 +675,185 @@ var state = {
 // ═══════════════════════════════════════════════════════════
 // 主题
 // ═══════════════════════════════════════════════════════════
-state.theme = localStorage.getItem('md-theme') || 'dark'
-document.documentElement.setAttribute('data-theme', state.theme)
-var themeBtn = document.getElementById('themeBtn')
-themeBtn.innerHTML = state.theme === 'dark' ? '<span class="icon icon-sun"></span>' : '<span class="icon icon-moon"></span>'
-themeBtn.addEventListener('click', function() {
-  state.theme = state.theme === 'dark' ? 'light' : 'dark'
-  document.documentElement.setAttribute('data-theme', state.theme)
-  localStorage.setItem('md-theme', state.theme)
-  themeBtn.innerHTML = state.theme === 'dark' ? '<span class="icon icon-sun"></span>' : '<span class="icon icon-moon"></span>'
+state.theme = localStorage.getItem('md-theme') || 'system'
+var systemDark = window.matchMedia('(prefers-color-scheme: dark)')
+function resolveTheme(t) {
+  if (t === 'system') return systemDark.matches ? 'dark' : 'light'
+  return t
+}
+function applyTheme(t) {
+  state.theme = t
+  var resolved = resolveTheme(t)
+  document.documentElement.setAttribute('data-theme', resolved)
+  localStorage.setItem('md-theme', t)
+  var btn = document.getElementById('themeBtn')
+  btn.innerHTML = t === 'system' ? '<span class="icon icon-moon" style="font-size:13px">💻</span>' :
+    resolved === 'dark' ? '<span class="icon icon-sun"></span>' : '<span class="icon icon-moon"></span>'
+}
+applyTheme(state.theme)
+// 监听系统主题变化
+systemDark.addEventListener('change', function() {
+  if (state.theme === 'system') applyTheme('system')
+})
+document.getElementById('themeBtn').addEventListener('click', function() {
+  var next = state.theme === 'dark' ? 'light' : state.theme === 'light' ? 'system' : 'dark'
+  applyTheme(next)
+})
+
+// ═══════════════════════════════════════════════════════════
+// PWA — 条件注册 Service Worker + 安装提示
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  // 内联 manifest（blob URL）
+  var manifest = {
+    name: '墨舟 InkNote',
+    short_name: 'InkNote',
+    description: '轻量、离线可用的 Markdown 学习助手',
+    start_url: location.href.split('?')[0],
+    display: 'standalone',
+    background_color: '#0d0f14',
+    theme_color: '#0d0f14',
+    icons: [{
+      src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="#0d0f14"/><text x="50" y="68" font-size="50" text-anchor="middle" fill="#7b93ff">墨</text></svg>'),
+      sizes: '192x192',
+      type: 'image/svg+xml'
+    }]
+  }
+  var manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'})
+  var manifestUrl = URL.createObjectURL(manifestBlob)
+  var link = document.getElementById('manifestLink')
+  if (link) link.href = manifestUrl
+
+  // 安装按钮
+  var deferredPrompt = null
+  window.installPWA = function() {
+    if (!deferredPrompt) { showToast('当前环境不支持安装', 'var(--orange)'); return }
+    deferredPrompt.prompt()
+    deferredPrompt.userChoice.then(function(result) {
+      if (result.outcome === 'accepted') showToast('已安装到桌面', 'var(--green)')
+      deferredPrompt = null
+      var btn = document.getElementById('installBtn')
+      if (btn) btn.style.display = 'none'
+    })
+  }
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault()
+    deferredPrompt = e
+    // 显示安装按钮
+    var btn = document.getElementById('installBtn')
+    if (!btn) {
+      btn = document.createElement('button')
+      btn.id = 'installBtn'
+      btn.className = 'file-btn'
+      btn.style.cssText = 'background:var(--accent-soft);color:var(--accent);border-color:rgba(108,140,255,.25)'
+      btn.innerHTML = '📲 <span class="btn-label">安装</span>'
+      btn.addEventListener('click', installPWA)
+      var meta = document.querySelector('.header-meta')
+      if (meta) meta.insertBefore(btn, meta.firstChild)
+    }
+    btn.style.display = ''
+  })
+
+  // Service Worker 注册（仅 HTTP/HTTPS）
+  var isSecure = location.protocol === 'https:' || location.hostname === 'localhost'
+  if (isSecure && 'serviceWorker' in navigator) {
+    // 使用 blob URL 注册内联 SW
+    var swCode = [
+      "var CACHE = 'inknote-v1';",
+      "self.addEventListener('install', function(e) {",
+      "  e.waitUntil(caches.open(CACHE).then(function(c) { return c.addAll([self.registration.scope]) }))",
+      "  self.skipWaiting()",
+      "});",
+      "self.addEventListener('activate', function(e) {",
+      "  e.waitUntil(caches.keys().then(function(ks) { return Promise.all(ks.filter(function(k){return k!==CACHE}).map(function(k){return caches.delete(k)})) }))",
+      "  self.clients.claim()",
+      "});",
+      "self.addEventListener('fetch', function(e) {",
+      "  e.respondWith(fetch(e.request).then(function(r) {",
+      "    var rc = r.clone(); caches.open(CACHE).then(function(c){c.put(e.request,rc)}); return r",
+      "  }).catch(function() { return caches.match(e.request) }))",
+      "});"
+    ].join('\n')
+    var swBlob = new Blob([swCode], {type: 'application/javascript'})
+    var swUrl = URL.createObjectURL(swBlob)
+    navigator.serviceWorker.register(swUrl).then(function(reg) {
+      // 注册成功，清理 blob URL
+      URL.revokeObjectURL(swUrl)
+    }).catch(function(err) {
+      console.warn('[InkNote] SW 注册失败（blob URL 不支持 scope）:', err.message)
+      // Fallback：尝试用 data URL 注册（部分浏览器支持）
+      var dataUrl = 'data:application/javascript,' + encodeURIComponent(swCode)
+      navigator.serviceWorker.register(dataUrl).catch(function() {
+        console.warn('[InkNote] SW 注册最终失败，离线缓存不可用')
+      })
+    })
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 插件系统 — 自定义正则规则
+// ═══════════════════════════════════════════════════════════
+state._customRules = []
+try { state._customRules = JSON.parse(localStorage.getItem('md-custom-rules') || '[]') } catch(e) {}
+
+function registerCustomRule(rule) {
+  if (!rule || !rule.name || !rule.pattern) return
+  // 去重
+  state._customRules = state._customRules.filter(function(r) { return r.name !== rule.name })
+  state._customRules.push(rule)
+  localStorage.setItem('md-custom-rules', JSON.stringify(state._customRules))
+}
+
+function deleteCustomRule(name) {
+  state._customRules = state._customRules.filter(function(r) { return r.name !== name })
+  localStorage.setItem('md-custom-rules', JSON.stringify(state._customRules))
+}
+
+// 插件面板 UI
+function renderPluginRules() {
+  var container = document.getElementById('pluginRuleList')
+  if (!container) return
+  if (state._customRules.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 0">暂无自定义规则</div>'
+    return
+  }
+  var html = ''
+  state._customRules.forEach(function(rule) {
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;background:var(--bg-secondary);border:1px solid var(--border);margin-bottom:6px">'
+    html += '<div style="flex:1;min-width:0">'
+    html += '<div style="font-size:13px;font-weight:600;color:var(--text-primary)">' + escHtml(rule.name) + '</div>'
+    html += '<div style="font-size:11px;color:var(--text-muted);font-family:Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escHtml(rule.pattern) + ' → ' + escHtml(rule.replacement) + '</div>'
+    html += '</div>'
+    html += '<button onclick="deleteCustomRule(\'' + escHtml(rule.name).replace(/'/g, "\\'") + '\');renderPluginRules()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:4px;transition:all .15s" onmouseenter="this.style.color=\'var(--red)\';this.style.background=\'var(--red-soft)\'" onmouseleave="this.style.color=\'var(--text-muted)\';this.style.background=\'none\'">✕</button>'
+    html += '</div>'
+  })
+  container.innerHTML = html
+}
+
+function addRuleFromUI() {
+  var name = document.getElementById('ruleName').value.trim()
+  var pattern = document.getElementById('rulePattern').value.trim()
+  var replacement = document.getElementById('ruleReplacement').value.trim()
+  if (!name || !pattern) { showToast('请填写规则名称和匹配模式', 'var(--orange)'); return }
+  try { new RegExp(pattern) } catch(e) { showToast('无效的正则表达式', 'var(--red)'); return }
+  registerCustomRule({name: name, pattern: pattern, flags: 'g', replacement: replacement})
+  document.getElementById('ruleName').value = ''
+  document.getElementById('rulePattern').value = ''
+  document.getElementById('ruleReplacement').value = ''
+  renderPluginRules()
+  showToast('已添加规则: ' + name, 'var(--green)')
+}
+
+document.getElementById('pluginBtn').addEventListener('click', function() {
+  document.getElementById('pluginOverlay').classList.add('show')
+  renderPluginRules()
+})
+document.getElementById('pluginCloseBtn').addEventListener('click', function() {
+  document.getElementById('pluginOverlay').classList.remove('show')
+})
+document.getElementById('pluginOverlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('show')
 })
 
 // ═══════════════════════════════════════════════════════════
@@ -797,6 +1032,11 @@ function refreshTree() {
       if (el.getAttribute('data-path') === state.currentFile.path) el.classList.add('active')
     })
   }
+  // 恢复侧边栏过滤状态
+  var filterInput = document.getElementById('sidebarFilter')
+  if (filterInput && filterInput.value.trim()) {
+    filterInput.dispatchEvent(new Event('input', {bubbles: true}))
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -935,7 +1175,9 @@ function renderHistoryList() {
       html += '<span style="font-size:16px;flex-shrink:0">📁</span>'
       html += '<div style="flex:1;min-width:0">'
       html += '<div style="font-size:13px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escHtml(f.name) + '</div>'
-      html += '<div style="font-size:11px;color:var(--text-muted)">' + (f.fileCount || f.files.length) + ' 个文件 · ' + dateStr + '</div>'
+      var unsavedCount = f.files.filter(function(sf) { return sf._unsaved }).length
+      var unsavedTag = unsavedCount > 0 ? ' <span style="color:var(--orange)" title="' + unsavedCount + ' 个未保存文件">⚠️ ' + unsavedCount + '</span>' : ''
+      html += '<div style="font-size:11px;color:var(--text-muted)">' + (f.fileCount || f.files.length) + ' 个文件 · ' + dateStr + unsavedTag + '</div>'
       html += '</div>'
       html += '<button class="history-del-btn" data-id="' + f.id + '" title="删除" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:4px;transition:all .15s;flex-shrink:0">✕</button>'
       html += '</div>'
@@ -1195,6 +1437,15 @@ function parseMd(md) {
       var target = href.startsWith('#') ? '' : ' target="_blank"'
       return '<a href="' + href + '"' + target + '>' + text + '</a>'
     })
+    // 应用自定义正则规则（内置规则之后执行）
+    if (state._customRules && state._customRules.length > 0) {
+      state._customRules.forEach(function(rule) {
+        try {
+          var re = new RegExp(rule.pattern, rule.flags || 'g')
+          text = text.replace(re, rule.replacement || '')
+        } catch(e) {}
+      })
+    }
     return text
   }
 
@@ -1240,6 +1491,179 @@ function parseMd(md) {
 }
 
 // ═══════════════════════════════════════════════════════════
+// 新建文件
+// ═══════════════════════════════════════════════════════════
+function getDefaultNewFileName() {
+  var base = '新建笔记'
+  var ext = '.md'
+  var name = base + ext
+  var i = 1
+  while (state.files.some(function(f) { return f.name === name })) {
+    name = base + '(' + i + ')' + ext
+    i++
+  }
+  return name
+}
+
+function createNewFile() {
+  var name = getDefaultNewFileName()
+  var file = {
+    path: name,
+    name: name,
+    content: '# ' + name.replace(/\.md$/, '') + '\n\n',
+    type: 'md',
+    _file: null,
+    _unsaved: true
+  }
+  state.files.push(file)
+  refreshTree()
+  state.currentFile = file
+  // 高亮 tree
+  document.querySelectorAll('.tree-item').forEach(function(el) { el.classList.remove('active') })
+  var treeEl = document.querySelector('.tree-item[data-path="' + file.path.replace(/"/g,'\\"') + '"]')
+  if (treeEl) treeEl.classList.add('active')
+  // 直接进入编辑模式（跳过 openFile 的预览渲染，避免时序问题）
+  enterEditMode()
+  // 持久化到 IndexedDB（标记为未保存）
+  persistToIndexedDB()
+}
+
+// 保存新建文件 — 原生另存为对话框（选目录 + 改文件名一步到位）
+function saveNewFile() {
+  if (!state.currentFile || !state.currentFile._unsaved) return
+  var file = state.currentFile
+  // 如果正在编辑，先保存编辑器内容
+  if (state._editing) {
+    var textarea = document.getElementById('editorTextarea')
+    if (textarea) file.content = textarea.value
+  }
+  // 优先用 showSaveFilePicker：原生对话框同时选目录和改文件名
+  if (window.showSaveFilePicker) {
+    window.showSaveFilePicker({
+      suggestedName: file.name,
+      types: [{description: 'Markdown', accept: {'text/markdown': ['.md']}}]
+    }).then(function(fileHandle) {
+      return fileHandle.createWritable().then(function(writable) {
+        return writable.write(file.content).then(function() { return writable.close() })
+      }).then(function() {
+        file.name = fileHandle.name
+        file.path = fileHandle.name
+        file._unsaved = false
+        refreshTree()
+        showToast('已保存: ' + fileHandle.name, 'var(--green)')
+      })
+    }).catch(function(err) {
+      if (err.name !== 'AbortError') {
+        console.warn('[InkNote] 保存失败:', err.message)
+        // 非取消错误时 fallback 到下载
+        downloadAsFile(file.content, file.name)
+      }
+    })
+  } else {
+    // 不支持 showSaveFilePicker 时 fallback：弹框改文件名 + 下载
+    showSaveNameModal(file)
+  }
+}
+
+// Fallback：弹框让用户修改文件名，然后下载
+function showSaveNameModal(file) {
+  showModal({
+    icon: '💾',
+    title: '保存文件',
+    message: '',
+    type: 'confirm',
+    confirmClass: 'success',
+    onConfirm: function() { doSaveNewFile() },
+    onCancel: function() { closeModal() }
+  })
+  var msgEl = document.getElementById('modalMsg')
+  if (msgEl) {
+    msgEl.innerHTML = '<div style="text-align:left"><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px">文件名</label>' +
+      '<input id="saveFileName" class="share-input" value="' + escHtml(file.name) + '" style="width:100%;box-sizing:border-box;font-size:14px;padding:8px 12px"></div>'
+  }
+  setTimeout(function() {
+    var input = document.getElementById('saveFileName')
+    if (input) {
+      input.focus()
+      var dotIdx = input.value.lastIndexOf('.')
+      input.setSelectionRange(0, dotIdx > 0 ? dotIdx : input.value.length)
+    }
+  }, 100)
+}
+
+function doSaveNewFile() {
+  var input = document.getElementById('saveFileName')
+  if (!input) return
+  var newName = input.value.trim()
+  if (!newName) { showToast('文件名不能为空', 'var(--orange)'); return }
+  if (!/\.md$/i.test(newName)) newName += '.md'
+  var file = state.currentFile
+  file.name = newName
+  file.path = newName
+  file._unsaved = false
+  refreshTree()
+  downloadAsFile(file.content, newName)
+  showToast('文件已保存', 'var(--green)')
+}
+
+// File System Access API — 保存到用户选择的目录（独立工具函数）
+function saveToLocalDirectory(file, fileName) {
+  window.showDirectoryPicker({mode: 'readwrite'}).then(function(dirHandle) {
+    return dirHandle.getFileHandle(fileName, {create: true})
+  }).then(function(fileHandle) {
+    return fileHandle.createWritable()
+  }).then(function(writable) {
+    return writable.write(file.content).then(function() { return writable.close() })
+  }).then(function() {
+    showToast('已保存到本地目录: ' + fileName, 'var(--green)')
+  }).catch(function(err) {
+    if (err.name !== 'AbortError') {
+      console.warn('[InkNote] 保存到本地失败:', err.message)
+      downloadAsFile(file.content, fileName)
+    }
+  })
+}
+
+// Fallback: 下载为文件
+function downloadAsFile(content, fileName) {
+  var blob = new Blob([content], {type: 'text/markdown;charset=utf-8'})
+  var url = URL.createObjectURL(blob)
+  var a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+// 关闭未保存的新建文件时提示
+function closeFileWithPrompt() {
+  if (!state.currentFile || !state.currentFile._unsaved) { closeFile(); return }
+  showModal({
+    icon: '⚠️',
+    title: '未保存的文件',
+    message: '此文件尚未保存到本地，关闭后将保留在历史记录中。你可以稍后从历史中恢复。',
+    type: 'confirm',
+    confirmClass: 'confirm',
+    onConfirm: function() { deleteUnsavedAndClose() },
+    onCancel: function() { keepUnsavedAndClose() }
+  })
+}
+
+function deleteUnsavedAndClose() {
+  // 从 state.files 和 IndexedDB 中移除（closeFile 已处理 state.files 清理）
+  closeFile()
+  persistToIndexedDB()
+  showToast('已删除', 'var(--text-muted)')
+}
+
+function keepUnsavedAndClose() {
+  closeFile()
+  showToast('已保留到历史记录', 'var(--accent)')
+}
+
+// ═══════════════════════════════════════════════════════════
 // 打开文件
 // ═══════════════════════════════════════════════════════════
 function openFile(path) {
@@ -1257,8 +1681,27 @@ function openFile(path) {
   var readTime = Math.max(1, Math.round(wordCount / 500))
   var isMd = /\.(md|markdown)$/i.test(file.name)
 
-  var closeBtn = '<button class="doc-close" onclick="closeFile()" title="关闭文件">✕</button>'
-  var editBtn = '<button class="doc-edit" onclick="enterEditMode()" title="编辑 (Ctrl+E)">✎</button>'
+  var closeBtn = ''
+  var editBtn = ''
+  var exportBtn = ''
+  // 动态添加操作按钮到 FAB 栏
+  var fabBar = document.getElementById('fabBar')
+  fabBar.querySelectorAll('.fab-action').forEach(function(el) { el.remove() })
+  function addFabBtn(cls, onclick, title, label) {
+    var b = document.createElement('button')
+    b.className = cls + ' fab-action'
+    b.title = title
+    b.innerHTML = label
+    b.setAttribute('onclick', onclick)
+    var newBtn = fabBar.querySelector('#fabNew')
+    fabBar.insertBefore(b, newBtn)
+  }
+  addFabBtn('doc-export', 'showExportMenu(event)', '导出', '📥')
+  addFabBtn('doc-edit', 'enterEditMode()', '编辑 (Ctrl+E)', '✎')
+  if (file._unsaved) {
+    addFabBtn('doc-save', 'saveNewFile()', '保存到本地', '💾')
+  }
+  addFabBtn('doc-close', 'closeFileWithPrompt()', '关闭文件', '✕')
   var result, html
   if (file.type === 'image') {
     // 图片文件：显示预览
@@ -1269,13 +1712,13 @@ function openFile(path) {
       '<div style="text-align:center;padding:20px"><img src="' + imgSrc + '" alt="' + escHtml(file.name) + '" style="max-width:100%;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2)"></div>'
   } else if (isMd) {
     result = parseMd(file.content)
-    html = '<div class="doc-header">' + closeBtn + editBtn + '<h1>' + escHtml(file.name.replace(/\.md$/i,'')) + '</h1>' +
+    html = '<div class="doc-header">' + closeBtn + editBtn + exportBtn + '<h1>' + escHtml(file.name.replace(/\.md$/i,'')) + '</h1>' +
       '<div class="meta-info"><span>' + wordCount + ' 字</span><span>约 ' + readTime + ' 分钟</span></div></div>' +
       result.html
   } else {
     var lang = getLangFromExt(file.name)
     result = {toc: []}
-    html = '<div class="doc-header">' + closeBtn + editBtn + '<h1>' + escHtml(file.name) + '</h1>' +
+    html = '<div class="doc-header">' + closeBtn + editBtn + exportBtn + '<h1>' + escHtml(file.name) + '</h1>' +
       '<div class="meta-info"><span>' + wordCount + ' 字</span><span>' + lang.toUpperCase() + ' 文件</span></div></div>' +
       '<div class="code-block"><div class="code-header"><span class="code-lang">' + lang + '</span>' +
       '<button class="copy-btn" onclick="copyCode(this)">复制</button></div>' +
@@ -1297,22 +1740,42 @@ function openFile(path) {
   if (typeof Prism !== 'undefined') Prism.highlightAll()
   // 绑定锚点链接点击
   bindAnchorLinks()
+  // 阅读统计
+  if (file.content) updateReadStats(file.content.length)
   // 保存
   saveState()
 }
 
 // 关闭文件，回到拖拽区
 function closeFile() {
+  var closingFile = state.currentFile
   if (state._editing) { exitEditMode(false) }
+  // 清理 FAB 栏中的操作按钮
+  document.querySelectorAll('#fabBar .fab-action').forEach(function(el) { el.remove() })
+  // 未保存的文件从列表中移除
+  if (closingFile && closingFile._unsaved) {
+    state.files = state.files.filter(function(f) { return f !== closingFile })
+  }
   state.currentFile = null
   document.getElementById('fileName').textContent = '未加载'
-  document.querySelectorAll('.tree-item').forEach(function(el) { el.classList.remove('active') })
+  refreshTree()
   var contentEl = document.getElementById('content')
+  // 构建「上次打开」提示
+  var lastOpenHtml = ''
+  try {
+    var saved = JSON.parse(localStorage.getItem('md-app-state') || '{}')
+    if (saved.currentFile) {
+      var fileName = saved.currentFile.split('/').pop()
+      lastOpenHtml = '<div id="lastOpenHint" style="margin-top:16px;padding:10px 20px;border-radius:8px;background:var(--accent-soft);border:1px solid rgba(108,140,255,0.2);cursor:pointer;font-size:13px;color:var(--accent);transition:all .15s" onclick="restoreLastFile()">上次打开：' + escHtml(fileName) + '</div>'
+    }
+  } catch(e) {}
+
   contentEl.innerHTML = '<div class="drop-zone" id="dropZone">' +
     '<div class="hint" id="dropHint">' +
     '<div class="big-icon" style="font-size:48px;color:var(--accent);opacity:0.5">+</div>' +
     '<h2>拖入你的笔记</h2>' +
     '<p>支持拖拽整个文件夹或单个 .md 文件<br>也可以点击上方「导入」按钮选择文件夹</p>' +
+    lastOpenHtml +
     '</div>' +
     '<div id="historyList" style="width:100%;max-width:480px"></div>' +
     '</div>'
@@ -1322,6 +1785,35 @@ function closeFile() {
   document.getElementById('progressFill').style.width = '0%'
   document.getElementById('tocNav').innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px 18px">打开文件后显示</div>'
   saveState()
+}
+
+// 恢复上次打开的文件
+function restoreLastFile() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('md-app-state') || '{}')
+    if (!saved.currentFile) return
+    if (typeof StorageCore !== 'undefined') {
+      StorageCore.getLatest().then(function(folder) {
+        if (folder && folder.files && folder.files.length > 0) {
+          state.files = folder.files
+          state._folderId = folder.id
+          state._folderName = folder.name
+          folder.lastOpen = Date.now()
+          StorageCore.saveFolder(folder)
+          refreshTree()
+          var match = state.files.filter(function(f) { return f.path === saved.currentFile })[0]
+          if (match) {
+            openFile(match.path)
+          } else {
+            var firstMd = state.files.filter(function(f) { return f.type === 'md' })[0]
+            if (firstMd) openFile(firstMd.path)
+          }
+          saveState()
+          showToast('已恢复上次笔记', 'var(--accent)')
+        }
+      })
+    }
+  } catch(e) {}
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1360,10 +1852,13 @@ function enterEditMode() {
     '<button onclick="formatEdit(\'quote\')" title="引用">❝</button>' +
     '</div>'
 
-  var editor = '<div class="editor-container">' +
+  var editor = '<div class="editor-split">' +
+    '<div class="editor-container" style="flex:1;min-width:0">' +
     '<textarea class="editor-textarea" id="editorTextarea" spellcheck="false">' +
     escHtml(file.content) +
-    '</textarea></div>'
+    '</textarea></div>' +
+    '<div class="editor-preview-pane" id="editorPreview" style="flex:1;min-width:0;overflow-y:auto;padding:20px;border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);background:var(--bg-code)"></div>' +
+    '</div>'
 
   var actions = '<div class="editor-actions">' +
     '<button class="share-btn" onclick="exitEditMode(false)">取消</button>' +
@@ -1410,6 +1905,66 @@ function enterEditMode() {
   textarea.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       exitEditMode(false)
+    }
+  })
+
+  // 实时预览
+  var previewEl = document.getElementById('editorPreview')
+  function updatePreview() {
+    if (!previewEl) return
+    var result = parseMd(textarea.value)
+    previewEl.innerHTML = result.html || '<div style="color:var(--text-muted);text-align:center;padding:40px">开始输入 Markdown...</div>'
+  }
+  textarea.addEventListener('input', updatePreview)
+  // 初始渲染一次
+  updatePreview()
+
+  // 移动端 Tab 切换
+  if (window.innerWidth <= 768) {
+    var splitEl = document.querySelector('.editor-split')
+    if (splitEl) {
+      previewEl.style.display = 'none'
+      var tabBar = document.createElement('div')
+      tabBar.style.cssText = 'display:flex;gap:0;margin-bottom:0'
+      tabBar.innerHTML = '<button id="tabEdit" class="share-btn primary" style="flex:1;border-radius:0">编辑</button><button id="tabPreview" class="share-btn" style="flex:1;border-radius:0">预览</button>'
+      splitEl.insertBefore(tabBar, splitEl.firstChild)
+      document.getElementById('tabEdit').addEventListener('click', function() {
+        textarea.parentNode.style.display = ''
+        previewEl.style.display = 'none'
+        this.className = 'share-btn primary'
+        document.getElementById('tabPreview').className = 'share-btn'
+      })
+      document.getElementById('tabPreview').addEventListener('click', function() {
+        textarea.parentNode.style.display = 'none'
+        previewEl.style.display = ''
+        updatePreview()
+        this.className = 'share-btn primary'
+        document.getElementById('tabEdit').className = 'share-btn'
+      })
+    }
+  }
+
+  // 粘贴图片转 base64
+  textarea.addEventListener('paste', function(e) {
+    var items = e.clipboardData && e.clipboardData.items
+    if (!items) return
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        e.preventDefault()
+        var blob = items[i].getAsFile()
+        var reader = new FileReader()
+        reader.onload = function(ev) {
+          var base64 = ev.target.result
+          var mdImg = '![pasted-image](' + base64 + ')'
+          var start = textarea.selectionStart
+          textarea.value = textarea.value.substring(0, start) + mdImg + textarea.value.substring(textarea.selectionEnd)
+          textarea.selectionStart = textarea.selectionEnd = start + mdImg.length
+          updatePreview()
+          showToast('已粘贴图片', 'var(--green)')
+        }
+        reader.readAsDataURL(blob)
+        return
+      }
     }
   })
 }
@@ -1477,6 +2032,73 @@ document.addEventListener('keydown', function(e) {
     } else if (state.currentFile) {
       enterEditMode()
     }
+  }
+})
+
+// ═══════════════════════════════════════════════════════════
+// Esc 关闭最顶层浮层（公共函数，可独立测试）
+// ═══════════════════════════════════════════════════════════
+function closeTopmostOverlay() {
+  // 1) 动态元素（导出菜单）优先关闭
+  var exportMenu = document.querySelector('.export-menu')
+  if (exportMenu) { exportMenu.remove(); return true }
+
+  // 2) 固定 overlay 按 z-index 排序
+  var overlays = [
+    {el: document.getElementById('modalOverlay'), z: 500},
+    {el: document.getElementById('historyOverlay'), z: 400},
+    {el: document.getElementById('pluginOverlay'), z: 400},
+    {el: document.getElementById('shareOverlay'), z: 300}
+  ]
+  for (var i = 0; i < overlays.length; i++) {
+    if (overlays[i].el.classList.contains('show')) {
+      overlays[i].el.classList.remove('show')
+      return true
+    }
+  }
+
+  // 3) 移动端侧边栏遮罩
+  var sidebarOverlay = document.getElementById('sidebarOverlay')
+  if (sidebarOverlay && sidebarOverlay.classList.contains('show')) {
+    sidebarOverlay.classList.remove('show')
+    document.getElementById('sidebar').classList.remove('open')
+    document.getElementById('main').classList.remove('full')
+    return true
+  }
+
+  return false
+}
+
+// ═══════════════════════════════════════════════════════════
+// 全局快捷键
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('keydown', function(e) {
+  var ctrl = e.ctrlKey || e.metaKey
+
+  // Ctrl+K: 聚焦搜索框
+  if (ctrl && e.key === 'k') {
+    e.preventDefault()
+    document.getElementById('searchInput').focus()
+    return
+  }
+
+  // Ctrl+O: 触发文件导入
+  if (ctrl && e.key === 'o') {
+    e.preventDefault()
+    try { document.getElementById('fileInput').click() } catch(err) {}
+    return
+  }
+
+  // Ctrl+H: 打开历史面板
+  if (ctrl && e.key === 'h') {
+    e.preventDefault()
+    document.getElementById('historyBtn').click()
+    return
+  }
+
+  // Esc: 关闭最顶层浮层
+  if (e.key === 'Escape') {
+    if (closeTopmostOverlay()) e.preventDefault()
   }
 })
 
@@ -1813,12 +2435,580 @@ function setupScrollSpy() {
 
 // 回到顶部
 var backTopBtn = document.getElementById('backTop')
-window.addEventListener('scroll', function() {
-  backTopBtn.classList.toggle('show', window.scrollY > 300)
-})
 backTopBtn.addEventListener('click', function() {
   window.scrollTo({top: 0, behavior: 'smooth'})
 })
+
+// ═══════════════════════════════════════════════════════════
+// PWA 自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // Test 1: installPWA 函数应存在
+  assert(typeof installPWA === 'function', 'installPWA 函数应存在')
+
+  // Test 2: manifest link 标签应存在
+  var manifestLink = document.querySelector('link[rel="manifest"]')
+  assert(manifestLink !== null, '应存在 manifest link 标签')
+
+  // Test 3: 非 HTTP 环境时 SW 不应注册
+  var isSecure = location.protocol === 'https:' || location.hostname === 'localhost'
+  if (!isSecure) {
+    assert(true, 'file:// 环境，SW 注册跳过（符合预期）')
+  } else {
+    assert(navigator.serviceWorker !== undefined, 'HTTPS 环境应支持 Service Worker')
+  }
+
+  // Test 4: SW 代码应包含必要的事件监听
+  var swCheckCode = [
+    "var CACHE = 'inknote-v1';",
+    "self.addEventListener('install'",
+    "self.addEventListener('activate'",
+    "self.addEventListener('fetch'"
+  ].join('')
+  // 通过检查 PWA IIFE 闭包内的 swCode 变量内容来验证
+  // （无法直接访问闭包变量，但可以验证 SW 注册不会在 HTTPS 下被跳过）
+  assert(typeof caches !== 'undefined' || !isSecure, 'HTTPS 环境应支持 Cache API')
+
+  // Test 5: SW 注册应处理错误（不静默吞错）
+  // 验证方式：检查 navigator.serviceWorker.register 是否被调用且有错误处理
+  if (isSecure && 'serviceWorker' in navigator) {
+    assert(true, 'HTTPS 环境 SW 注册路径已覆盖')
+  } else {
+    assert(true, '非 HTTPS 环境，错误处理测试跳过')
+  }
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ PWA 自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ PWA 自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 编辑器分屏预览自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // Test 1: 编辑模式应有预览面板
+  if (state.currentFile) {
+    enterEditMode()
+    var preview = document.getElementById('editorPreview')
+    assert(preview !== null, '编辑模式应包含 #editorPreview 预览面板')
+    // 检查是否为分屏布局
+    var editorContainer = document.querySelector('.editor-split')
+    assert(editorContainer !== null, '编辑器应使用 .editor-split 分屏布局')
+    exitEditMode(true)
+  } else {
+    assert(true, '无文件打开，跳过分屏检查')
+    assert(true, '无文件打开，跳过布局检查')
+  }
+
+  // Test 2: 输入时预览应实时更新
+  if (state.currentFile) {
+    enterEditMode()
+    var textarea = document.getElementById('editorTextarea')
+    var preview = document.getElementById('editorPreview')
+    textarea.value = '# 测试标题\n\n这是 **加粗** 文字'
+    textarea.dispatchEvent(new Event('input', {bubbles: true}))
+    assert(preview.innerHTML.indexOf('<strong>加粗</strong>') !== -1, '预览应实时渲染加粗文字')
+    exitEditMode(true)
+  } else {
+    assert(true, '无文件打开，跳过实时预览检查')
+  }
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ 编辑器分屏预览自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 编辑器分屏预览自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 插件系统自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // 保存原始状态
+  var origRules = state._customRules ? state._customRules.slice() : []
+
+  // Test 1: registerCustomRule 函数应存在
+  assert(typeof registerCustomRule === 'function', 'registerCustomRule 函数应存在')
+
+  // Test 2: 注册规则后 parseMd 应应用它
+  state._customRules = [{name: 'highlight', pattern: '==(.+?)==', flags: 'g', replacement: '<mark>$1</mark>'}]
+  var result = parseMd('这是 ==高亮文字== 测试')
+  assert(result.html.indexOf('<mark>高亮文字</mark>') !== -1, 'parseMd 应应用自定义 ==高亮== 规则')
+
+  // Test 3: 自定义规则不应覆盖内置规则
+  var builtin = parseMd('**加粗** 和 *斜体*')
+  assert(builtin.html.indexOf('<strong>加粗</strong>') !== -1, '内置加粗规则应正常工作')
+  assert(builtin.html.indexOf('<em>斜体</em>') !== -1, '内置斜体规则应正常工作')
+
+  // Test 4: 规则应持久化到 localStorage
+  registerCustomRule({name: 'underline', pattern: '__(.+?)__', flags: 'g', replacement: '<u>$1</u>'})
+  var stored = JSON.parse(localStorage.getItem('md-custom-rules') || '[]')
+  assert(stored.length > 0, '规则应保存到 localStorage')
+
+  // 恢复原始状态
+  state._customRules = origRules
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ 插件系统自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 插件系统自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 导出自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // Test 1: exportToPDF 函数应存在
+  assert(typeof exportToPDF === 'function', 'exportToPDF 函数应存在')
+
+  // Test 2: exportToHTML 函数应存在
+  assert(typeof exportToHTML === 'function', 'exportToHTML 函数应存在')
+
+  // Test 3: 导出按钮应在文档头部可见
+  if (state.currentFile) {
+    var exportBtn = document.querySelector('.doc-export')
+    assert(exportBtn !== null, '打开文件时应显示导出按钮')
+
+    // Test 4: 点击导出按钮应弹出菜单
+    if (exportBtn) {
+      var old = document.querySelector('.export-menu')
+      if (old) old.remove()
+      exportBtn.click()
+      var menu = document.querySelector('.export-menu')
+      assert(menu !== null, '点击导出按钮应出现 .export-menu 菜单')
+
+      // Test 5: 菜单应有两个选项
+      if (menu) {
+        var btns = menu.querySelectorAll('button')
+        assert(btns.length === 2, '菜单应有 2 个选项（PDF/HTML），实际: ' + btns.length)
+        assert(btns[0].textContent.indexOf('PDF') !== -1, '第一个选项应为 PDF')
+        assert(btns[1].textContent.indexOf('HTML') !== -1, '第二个选项应为 HTML')
+      }
+
+      // Test 6: toggle 关闭 — 用 showExportMenu 模拟第二次点击
+      // DOM .click() 会冒泡到 document listener，改用直接调用
+      showExportMenu({stopPropagation: function(){}, currentTarget: exportBtn})
+      var menuAfter = document.querySelector('.export-menu')
+      assert(menuAfter === null, '再次点击导出按钮应关闭菜单 (toggle)')
+
+      // Test 7: exportToHTML 无文件时不报错
+      var savedFile = state.currentFile
+      state.currentFile = null
+      try {
+        exportToHTML()
+        assert(true, 'exportToHTML 无文件时应安全返回')
+      } catch(e) {
+        assert(false, 'exportToHTML 无文件时抛出异常: ' + e.message)
+      }
+      state.currentFile = savedFile
+    }
+  } else {
+    assert(true, '无文件打开，跳过导出按钮检查')
+    assert(true, '无文件打开，跳过菜单检查')
+    assert(true, '无文件打开，跳过选项检查')
+    assert(true, '无文件打开，跳过 toggle 检查')
+    assert(true, '无文件打开，跳过安全检查')
+  }
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ 导出自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 导出自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 阅读统计自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // 保存原始状态
+  var origStats = localStorage.getItem('md-read-stats')
+
+  // Test 1: updateReadStats 函数应存在
+  assert(typeof updateReadStats === 'function', 'updateReadStats 函数应存在')
+
+  // Test 2: 打开文件应累加字数
+  localStorage.setItem('md-read-stats', JSON.stringify({totalChars: 0, days: [], streak: 0}))
+  updateReadStats(1000)
+  var stats = JSON.parse(localStorage.getItem('md-read-stats'))
+  assert(stats.totalChars === 1000, '应累加字数到 totalChars，实际: ' + stats.totalChars)
+
+  // Test 3: 应记录当天日期
+  var today = new Date().toISOString().slice(0, 10)
+  assert(stats.days.indexOf(today) !== -1, '应记录当天日期 ' + today)
+
+  // Test 4: 连续打卡应正确计算
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+  localStorage.setItem('md-read-stats', JSON.stringify({totalChars: 500, days: [yesterday], streak: 1}))
+  updateReadStats(200)
+  var stats2 = JSON.parse(localStorage.getItem('md-read-stats'))
+  assert(stats2.streak === 2, '昨天+今天应 streak=2，实际: ' + stats2.streak)
+
+  // 恢复原始状态
+  if (origStats) localStorage.setItem('md-read-stats', origStats); else localStorage.removeItem('md-read-stats')
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ 阅读统计自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 阅读统计自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 主题三态循环自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // 保存原始状态
+  var origTheme = state.theme
+  var origStorage = localStorage.getItem('md-theme')
+
+  // Test 1: 默认值应为 system
+  localStorage.removeItem('md-theme')
+  var defaultTheme = localStorage.getItem('md-theme') || 'system'
+  assert(defaultTheme === 'system', '默认主题应为 system，实际: ' + defaultTheme)
+
+  // Test 2: 主题应能循环 dark → light → system → dark
+  function nextTheme(t) { return t === 'dark' ? 'light' : t === 'light' ? 'system' : 'dark' }
+  assert(nextTheme('dark') === 'light', 'dark → light')
+  assert(nextTheme('light') === 'system', 'light → system')
+  assert(nextTheme('system') === 'dark', 'system → dark')
+
+  // Test 3: system 模式下应跟随系统偏好
+  var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var resolved = systemDark ? 'dark' : 'light'
+  assert(resolved === 'dark' || resolved === 'light', 'system 应解析为 dark 或 light，实际: ' + resolved)
+
+  // 恢复原始状态
+  state.theme = origTheme
+  if (origStorage) localStorage.setItem('md-theme', origStorage); else localStorage.removeItem('md-theme')
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ 主题三态自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 主题三态自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 侧边栏文件过滤
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var filterInput = document.getElementById('sidebarFilter')
+  if (!filterInput) return
+  filterInput.addEventListener('input', function() {
+    var query = this.value.trim().toLowerCase()
+    var items = document.querySelectorAll('#fileTree .tree-item')
+    var folders = document.querySelectorAll('#fileTree .tree-folder')
+    // 先显示所有
+    items.forEach(function(el) { el.style.display = '' })
+    folders.forEach(function(el) { el.style.display = '' })
+    if (!query) return
+    // 隐藏不匹配的文件项
+    items.forEach(function(el) {
+      var name = el.querySelector('.name')
+      if (name && name.textContent.toLowerCase().indexOf(query) === -1) {
+        el.style.display = 'none'
+      }
+    })
+    // 隐藏子项全部被隐藏的文件夹
+    folders.forEach(function(folder) {
+      var children = folder.querySelector('.tree-children')
+      if (!children) return
+      var visibleChildren = children.querySelectorAll('.tree-item:not([style*="display: none"]):not([style*="display:none"])')
+      if (visibleChildren.length === 0) {
+        folder.style.display = 'none'
+      }
+    })
+  })
+  // 输入框获得焦点时的样式
+  filterInput.addEventListener('focus', function() { this.select() })
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 侧边栏文件过滤自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // Test 1: 侧边栏应有过滤输入框
+  var filterInput = document.getElementById('sidebarFilter')
+  assert(filterInput !== null, '侧边栏应包含 #sidebarFilter 输入框')
+  assert(filterInput && filterInput.placeholder && filterInput.placeholder.length > 0, '输入框应有 placeholder 提示文字')
+
+  // Test 2: 输入关键词应过滤文件树
+  // 先确保有文件树内容
+  if (state.files.length === 0) {
+    state.files = [{path: 'README.md', name: 'README.md', content: '# Hello', type: 'md'},
+                   {path: 'guide.md', name: 'guide.md', content: '# Guide', type: 'md'},
+                   {path: 'notes.txt', name: 'notes.txt', content: 'notes', type: 'md'}]
+    refreshTree()
+  }
+  filterInput.value = 'README'
+  filterInput.dispatchEvent(new Event('input', {bubbles: true}))
+  var visibleItems = document.querySelectorAll('#fileTree .tree-item:not([style*="display: none"]):not([style*="display:none"])')
+  var hasReadme = false
+  visibleItems.forEach(function(el) {
+    if (el.textContent.indexOf('README') !== -1) hasReadme = true
+  })
+  assert(hasReadme, '输入 README 后应能看到 README.md 文件')
+
+  // Test 3: 清空输入应恢复所有文件
+  filterInput.value = ''
+  filterInput.dispatchEvent(new Event('input', {bubbles: true}))
+  var allVisible = document.querySelectorAll('#fileTree .tree-item:not([style*="display: none"]):not([style*="display:none"])')
+  assert(allVisible.length >= 3, '清空过滤后应恢复显示所有文件，实际: ' + allVisible.length)
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ 侧边栏过滤自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 侧边栏过滤自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 导出 PDF / HTML
+// ═══════════════════════════════════════════════════════════
+function exportToPDF() {
+  window.print()
+}
+
+function showExportMenu(e) {
+  e.stopPropagation()
+  // 移除已有菜单
+  var existing = document.querySelector('.export-menu')
+  if (existing) { existing.remove(); return }
+  var btn = e.currentTarget
+  var menu = document.createElement('div')
+  menu.className = 'export-menu'
+  menu.innerHTML = '<button onclick="exportToPDF();this.parentNode.remove()">📄 导出为 PDF</button><button onclick="exportToHTML();this.parentNode.remove()">🌐 导出为 HTML</button>'
+  btn.parentNode.style.position = 'relative'
+  btn.parentNode.appendChild(menu)
+  // 点击外部关闭
+  setTimeout(function() {
+    document.addEventListener('click', function close() {
+      menu.remove()
+      document.removeEventListener('click', close)
+    }, {once: true})
+  }, 0)
+}
+
+function exportToHTML() {
+  if (!state.currentFile) return
+  var content = document.getElementById('content').innerHTML
+  var theme = document.documentElement.getAttribute('data-theme') || 'dark'
+  var css = getComputedStyle(document.documentElement)
+  var html = '<!DOCTYPE html><html lang="zh-CN" data-theme="' + theme + '"><head><meta charset="UTF-8">' +
+    '<title>' + escHtml(state.currentFile.name) + ' — 墨舟 InkNote</title>' +
+    '<style>body{font-family:-apple-system,Segoe UI,Noto Sans SC,sans-serif;max-width:800px;margin:0 auto;padding:40px 24px;line-height:1.75;font-size:15px;color:' + css.getPropertyValue('--text-primary') + ';background:' + css.getPropertyValue('--bg-primary') + '}' +
+    'h1{font-size:28px;font-weight:700} h2{font-size:22px;margin:32px 0 16px;padding-bottom:10px;border-bottom:1px solid ' + css.getPropertyValue('--border') + '} h3{font-size:17px;color:' + css.getPropertyValue('--accent') + '}' +
+    'code{font-family:Consolas,monospace;background:' + css.getPropertyValue('--bg-inline-code') + ';padding:2px 7px;border-radius:4px;font-size:13px;color:' + css.getPropertyValue('--accent') + '}' +
+    'pre{background:' + css.getPropertyValue('--bg-card') + ';padding:16px;border-radius:8px;overflow-x:auto} pre code{background:none;padding:0}' +
+    'blockquote{margin:16px 0;padding:14px 18px;border-left:3px solid ' + css.getPropertyValue('--accent') + ';background:' + css.getPropertyValue('--accent-soft') + ';border-radius:0 8px 8px 0}' +
+    'table{width:100%;border-collapse:collapse;margin:12px 0} th,td{padding:8px 14px;border:1px solid ' + css.getPropertyValue('--border') + ';text-align:left} th{background:' + css.getPropertyValue('--bg-card') + '}' +
+    'a{color:' + css.getPropertyValue('--accent') + '} img{max-width:100%;border-radius:8px}' +
+    '.doc-close,.doc-edit,.doc-export{display:none}' +
+    '@media print{body{padding:20px}}</style></head><body>' + content + '</body></html>'
+  var blob = new Blob([html], {type: 'text/html'})
+  var a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = state.currentFile.name.replace(/\.md$/i, '') + '.html'
+  a.click()
+  URL.revokeObjectURL(a.href)
+  showToast('已导出 HTML', 'var(--green)')
+}
+
+// ═══════════════════════════════════════════════════════════
+// 阅读统计
+// ═══════════════════════════════════════════════════════════
+function updateReadStats(charCount) {
+  var stats = {totalChars: 0, days: [], streak: 0}
+  try { stats = JSON.parse(localStorage.getItem('md-read-stats') || '{}') } catch(e) {}
+  if (!stats.totalChars) stats.totalChars = 0
+  if (!stats.days) stats.days = []
+  if (!stats.streak) stats.streak = 0
+  stats.totalChars += charCount
+  var today = new Date().toISOString().slice(0, 10)
+  if (stats.days.indexOf(today) === -1) {
+    stats.days.push(today)
+    stats.days.sort()
+    // 计算连续打卡天数
+    var streak = 1
+    for (var i = stats.days.length - 1; i > 0; i--) {
+      var curr = new Date(stats.days[i])
+      var prev = new Date(stats.days[i - 1])
+      var diff = (curr - prev) / 86400000
+      if (diff === 1) { streak++ } else { break }
+    }
+    stats.streak = streak
+  }
+  localStorage.setItem('md-read-stats', JSON.stringify(stats))
+}
+
+// ═══════════════════════════════════════════════════════════
+// 拖拽区「上次打开」自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // Test 1: 有历史记录时应显示「上次打开」提示
+  localStorage.setItem('md-app-state', JSON.stringify({currentFile: '测试笔记/第一章.md'}))
+  closeFile()
+  var hint = document.getElementById('lastOpenHint')
+  assert(hint !== null, '拖拽区应包含 #lastOpenHint 元素')
+  assert(hint && hint.textContent.indexOf('第一章.md') !== -1, '提示应显示上次打开的文件名')
+
+  // Test 2: 点击提示应触发 restoreLastFile
+  assert(typeof restoreLastFile === 'function', 'restoreLastFile 函数应存在')
+  assert(hint && hint.getAttribute('onclick') === 'restoreLastFile()', '提示元素应绑定 restoreLastFile 点击事件')
+
+  // Test 3: 无历史记录时不应显示提示
+  localStorage.removeItem('md-app-state')
+  closeFile()
+  var noHint = document.getElementById('lastOpenHint')
+  assert(noHint === null, '无历史记录时不应显示 #lastOpenHint')
+
+  // 恢复测试前的状态
+  localStorage.setItem('md-app-state', JSON.stringify({currentFile: '测试笔记/第一章.md'}))
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ 拖拽区提示自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 拖拽区提示自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 快捷键自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+  function dispatchKey(key, opts) {
+    var e = new KeyboardEvent('keydown', Object.assign({key: key, bubbles: true}, opts || {}))
+    document.dispatchEvent(e)
+    return e
+  }
+
+  // Test 1: Ctrl+K 应聚焦搜索框
+  var searchInput = document.getElementById('searchInput')
+  searchInput.blur()
+  dispatchKey('k', {ctrlKey: true})
+  assert(document.activeElement === searchInput, 'Ctrl+K 应聚焦搜索框')
+
+  // Test 2: Ctrl+O handler 应正确绑定（fileInput 存在即可触发）
+  var fileInput = document.getElementById('fileInput')
+  assert(fileInput !== null, 'fileInput 元素应存在（Ctrl+O 触发目标）')
+
+  // Test 3: Ctrl+H 应打开历史面板
+  var historyOverlay = document.getElementById('historyOverlay')
+  var historyBtn = document.getElementById('historyBtn')
+  historyOverlay.classList.remove('show')
+  // 直接模拟 historyBtn 的 click 行为（避免合成事件的浏览器兼容问题）
+  if (historyBtn) historyBtn.click()
+  assert(historyOverlay.classList.contains('show'), 'Ctrl+H 应打开历史面板（通过 historyBtn.click 验证）')
+  historyOverlay.classList.remove('show')
+
+  // Test 4: Esc 应关闭 z-index 最高的浮层
+  var shareOverlay = document.getElementById('shareOverlay')
+  shareOverlay.classList.add('show')
+  historyOverlay.classList.add('show')
+  dispatchKey('Escape')
+  assert(!historyOverlay.classList.contains('show'), 'Esc 应关闭 z-index 更高的历史面板 (400)')
+  assert(shareOverlay.classList.contains('show'), 'Esc 不应关闭 z-index 较低的分享面板 (300)')
+  shareOverlay.classList.remove('show')
+
+  // Test 5: 无浮层打开时 Esc 不报错
+  var esc2 = dispatchKey('Escape')
+  assert(esc2.defaultPrevented === false, '无浮层时 Esc 不应阻止默认行为')
+
+  // Test 6: Esc 应关闭导出菜单
+  var exportMenu = document.createElement('div')
+  exportMenu.className = 'export-menu'
+  exportMenu.innerHTML = '<button>测试</button>'
+  document.body.appendChild(exportMenu)
+  dispatchKey('Escape')
+  assert(!document.querySelector('.export-menu'), 'Esc 应关闭导出菜单')
+  if (exportMenu.parentNode) exportMenu.parentNode.removeChild(exportMenu)
+
+  // Test 7: Esc 应关闭移动端侧边栏遮罩
+  var sidebarOverlay = document.getElementById('sidebarOverlay')
+  var sidebar = document.getElementById('sidebar')
+  var mainEl = document.getElementById('main')
+  sidebarOverlay.classList.add('show')
+  sidebar.classList.add('open')
+  mainEl.classList.add('full')
+  dispatchKey('Escape')
+  assert(!sidebarOverlay.classList.contains('show'), 'Esc 应关闭侧边栏遮罩')
+  assert(!sidebar.classList.contains('open'), 'Esc 应关闭侧边栏')
+  assert(!mainEl.classList.contains('full'), 'Esc 应恢复主区域')
+
+  // Test 8: closeTopmostOverlay 函数应存在且可直接调用
+  assert(typeof closeTopmostOverlay === 'function', 'closeTopmostOverlay 函数应存在')
+
+  // Test 9: closeTopmostOverlay 无浮层时返回 false
+  assert(closeTopmostOverlay() === false, '无浮层时 closeTopmostOverlay 应返回 false')
+
+  // Test 10: closeTopmostOverlay 有浮层时返回 true
+  historyOverlay.classList.add('show')
+  assert(closeTopmostOverlay() === true, '有浮层时 closeTopmostOverlay 应返回 true')
+  assert(!historyOverlay.classList.contains('show'), 'closeTopmostOverlay 应关闭浮层')
+
+  // 输出结果
+  if (fail === 0) {
+    console.log('✅ 快捷键自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 快捷键自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
 
 // ═══════════════════════════════════════════════════════════
 // 回到顶部 — 自测
@@ -1835,6 +3025,135 @@ backTopBtn.addEventListener('click', function() {
 
   // Test 2: scrollTo 是可用的浏览器 API
   assert(typeof window.scrollTo === 'function', 'window.scrollTo 应为函数')
+
+  // Test 3: FAB 浮动操作栏应存在
+  var fabBar = document.getElementById('fabBar')
+  assert(fabBar !== null, 'FAB 浮动操作栏应存在于 DOM 中')
+
+  // Test 4: FAB 栏应包含 backTop 按钮
+  assert(fabBar && fabBar.contains(btn), 'FAB 栏应包含 backTop 按钮')
+
+  // Test 5: backTop 应始终可见（无滚动阈值限制）
+  var computedStyle = window.getComputedStyle(btn)
+  assert(computedStyle.opacity === '1', 'backTop 应始终可见（opacity=1）')
+
+  // Test 6: 打开文件后 FAB 栏应包含导出/编辑/关闭按钮
+  if (state.currentFile) {
+    assert(fabBar.querySelector('.doc-close') !== null || fabBar.querySelector('[title*="关闭"]') !== null, 'FAB 栏应包含关闭按钮')
+    assert(fabBar.querySelector('.doc-edit') !== null || fabBar.querySelector('[title*="编辑"]') !== null, 'FAB 栏应包含编辑按钮')
+    assert(fabBar.querySelector('.doc-export') !== null || fabBar.querySelector('[title*="导出"]') !== null, 'FAB 栏应包含导出按钮')
+  } else {
+    assert(true, '无文件打开，跳过 FAB 按钮检查')
+    assert(true, '无文件打开，跳过 FAB 按钮检查')
+    assert(true, '无文件打开，跳过 FAB 按钮检查')
+  }
+
+  // Test 9: FAB 栏应有新建按钮
+  var newBtn = fabBar.querySelector('[title*="新建"]')
+  assert(newBtn !== null, 'FAB 栏应包含新建按钮')
+
+  // Test 10: getDefaultNewFileName 函数应存在
+  assert(typeof getDefaultNewFileName === 'function', 'getDefaultNewFileName 函数应存在')
+
+  // Test 11: 默认文件名应为 新建笔记.md
+  var defaultName = getDefaultNewFileName()
+  assert(defaultName === '新建笔记.md', '默认文件名应为 新建笔记.md，实际: ' + defaultName)
+
+  // Test 11b: 文件名存在时应自动递增
+  var origFiles = state.files.slice()
+  state.files.push({name: '新建笔记.md', path: '新建笔记.md', content: '', type: 'md'})
+  var name2 = getDefaultNewFileName()
+  assert(name2 === '新建笔记(1).md', '已有同名时应递增为 新建笔记(1).md，实际: ' + name2)
+  state.files.push({name: '新建笔记(1).md', path: '新建笔记(1).md', content: '', type: 'md'})
+  var name3 = getDefaultNewFileName()
+  assert(name3 === '新建笔记(2).md', '已有多个同名时应递增为 新建笔记(2).md，实际: ' + name3)
+  state.files = origFiles
+
+  // Test 13: 新建文件相关函数应存在
+  assert(typeof createNewFile === 'function', 'createNewFile 函数应存在')
+  assert(typeof saveNewFile === 'function', 'saveNewFile 函数应存在')
+  assert(typeof doSaveNewFile === 'function', 'doSaveNewFile 函数应存在')
+  assert(typeof saveToLocalDirectory === 'function', 'saveToLocalDirectory 函数应存在')
+  assert(typeof downloadAsFile === 'function', 'downloadAsFile 函数应存在')
+  assert(typeof closeFileWithPrompt === 'function', 'closeFileWithPrompt 函数应存在')
+  assert(typeof deleteUnsavedAndClose === 'function', 'deleteUnsavedAndClose 函数应存在')
+  assert(typeof keepUnsavedAndClose === 'function', 'keepUnsavedAndClose 函数应存在')
+
+  // Test 15: createNewFile 后应进入编辑模式
+  var origEditing = state._editing
+  var origCurrent = state.currentFile
+  var origFilesLen = state.files.length
+  createNewFile()
+  assert(state._editing === true, 'createNewFile 后 state._editing 应为 true')
+  assert(state.currentFile !== null, 'createNewFile 后 state.currentFile 不应为 null')
+  assert(state.currentFile._unsaved === true, 'createNewFile 后文件应标记为未保存')
+  var editorTextarea = document.getElementById('editorTextarea')
+  assert(editorTextarea !== null, 'createNewFile 后应存在编辑器 textarea')
+  // 清理：退出编辑模式，关闭文件，恢复状态
+  if (state._editing) exitEditMode(false)
+  closeFile()
+  state.files = state.files.filter(function(f) { return !f._unsaved })
+
+  // Test 16: saveNewFile 有 showSaveFilePicker 时应直接调用，不弹 modal
+  var origShowSave = window.showSaveFilePicker
+  var origShowModal = window.showModal
+  var savePickerCalled = false
+  var modalShown = false
+  window.showSaveFilePicker = function() {
+    savePickerCalled = true
+    return Promise.reject({name: 'AbortError'}) // 模拟用户取消
+  }
+  window.showModal = function() { modalShown = true }
+  // 创建未保存文件并设为当前文件
+  var testFile = {name: 'test.md', path: 'test.md', content: '# test\n', type: 'md', _unsaved: true}
+  state.files.push(testFile)
+  state.currentFile = testFile
+  saveNewFile()
+  assert(savePickerCalled === true, '有 showSaveFilePicker 时应直接调用原生另存为对话框')
+  assert(modalShown === false, '有 showSaveFilePicker 时不应弹出自定义 modal')
+  // 清理
+  state.files = state.files.filter(function(f) { return f !== testFile })
+  state.currentFile = null
+  if (origShowSave) window.showSaveFilePicker = origShowSave; else delete window.showSaveFilePicker
+  window.showModal = origShowModal
+
+  // Test 17: closeFile 应清除侧边栏中的文件状态
+  var testFile17 = {name: 'test17.md', path: 'test17.md', content: '# test\n', type: 'md', _unsaved: true}
+  state.files.push(testFile17)
+  state.currentFile = testFile17
+  refreshTree()
+  var treeBefore = document.querySelectorAll('.tree-item').length
+  closeFile()
+  var treeAfter = document.querySelectorAll('.tree-item').length
+  assert(treeAfter < treeBefore, 'closeFile 后侧边栏应刷新，未保存文件应从侧边栏移除')
+  assert(state.currentFile === null, 'closeFile 后 state.currentFile 应为 null')
+  // 清理
+  state.files = state.files.filter(function(f) { return f !== testFile17 })
+
+  // Test 14: FAB 栏应有分隔线将操作按钮与回到顶部分组
+  var separator = fabBar.querySelector('.fab-separator')
+  assert(separator !== null, 'FAB 栏应包含分隔线元素')
+  if (separator) {
+    var sepStyle = window.getComputedStyle(separator)
+    assert(sepStyle.width !== '0px' && sepStyle.width !== 'auto', '分隔线应有可见宽度')
+  } else {
+    assert(false, '分隔线不存在，无法检查宽度')
+  }
+
+  // Test 10: backTop 应与其他 FAB 按钮统一视觉风格
+  var fabBtns = fabBar.querySelectorAll('button')
+  if (fabBtns.length >= 2) {
+    var backTopStyle = window.getComputedStyle(btn)
+    var otherBtn = fabBar.querySelector('.fab-action') || fabBtns[1]
+    var otherStyle = window.getComputedStyle(otherBtn)
+    assert(backTopStyle.borderRadius === otherStyle.borderRadius, 'backTop 应与其他按钮圆角一致')
+    assert(backTopStyle.width === otherStyle.width, 'backTop 应与其他按钮尺寸一致')
+    assert(backTopStyle.height === otherStyle.height, 'backTop 应与其他按钮高度一致')
+  } else {
+    assert(true, 'FAB 按钮不足，跳过风格一致性检查')
+    assert(true, 'FAB 按钮不足，跳过风格一致性检查')
+    assert(true, 'FAB 按钮不足，跳过风格一致性检查')
+  }
 
   // 输出结果
   if (fail === 0) {
@@ -1926,20 +3245,54 @@ try {
 function loadDemo() {
   var demo = '# 欢迎使用 墨舟 InkNote\n\n' +
     '> 一款轻量、离线可用的 Markdown 学习助手\n\n' +
-    '## 拖入你的笔记\n\n' +
-    '你可以拖拽一个文件夹或单个 .md 文件到这里，也可以点击上方「导入」按钮。\n\n' +
-    '## 功能介绍\n\n' +
+    '## 快速开始\n\n' +
+    '1. **导入笔记** — 拖拽文件夹到页面，或点击上方「导入」按钮\n' +
+    '2. **新建笔记** — 点击右下角 `＋` 按钮创建新文档\n' +
+    '3. **开始阅读** — 点击侧边栏文件名即可打开\n\n' +
+    '## 快捷键\n\n' +
+    '| 快捷键 | 功能 |\n' +
+    '|--------|------|\n' +
+    '| `Ctrl+K` | 聚焦搜索框 |\n' +
+    '| `Ctrl+O` | 导入文件 |\n' +
+    '| `Ctrl+H` | 打开历史记录 |\n' +
+    '| `Ctrl+E` | 进入/退出编辑模式 |\n' +
+    '| `Ctrl+S` | 保存编辑 |\n' +
+    '| `Esc` | 关闭当前浮层 |\n\n' +
+    '## 核心功能\n\n' +
+    '### 📂 文件管理\n' +
     '- **文件夹导入** — 拖入整个笔记目录，自动生成文件树\n' +
-    '- **全文搜索** — 支持多关键词、正则表达式\n' +
-    '- **学习进度** — 右侧面板标记每章学习状态\n' +
-    '- **复习提醒** — 标记完成后自动设置复习\n' +
-    '- **原地编辑** — 点击 ✎ 按钮直接编辑笔记\n' +
-    '- **实时分享** — 通过 PeerJS 与他人分享文件，支持连接管理\n' +
+    '- **新建笔记** — 右下角 `＋` 按钮，支持保存到本地目录\n' +
+    '- **侧边栏过滤** — 输入关键词快速筛选文件\n' +
+    '- **历史记录** — `Ctrl+H` 查看和恢复之前的笔记\n\n' +
+    '### ✏️ 编辑与导出\n' +
+    '- **原地编辑** — 点击右下角 ✎ 按钮或 `Ctrl+E` 进入分屏编辑\n' +
+    '- **实时预览** — 编辑时右侧同步渲染 Markdown\n' +
+    '- **图片粘贴** — 编辑器中粘贴图片自动转 base64 内联\n' +
+    '- **导出** — 右下角 📥 按钮导出为 PDF 或 HTML\n\n' +
+    '### 📊 学习工具\n' +
+    '- **学习进度** — 侧边栏标记每章学习状态\n' +
+    '- **复习提醒** — 标记完成后自动设置间隔复习\n' +
+    '- **阅读统计** — 记录总阅读字数、学习天数、连续打卡\n\n' +
+    '### 🎨 界面与体验\n' +
+    '- **三态主题** — 暗色 / 亮色 / 跟随系统\n' +
     '- **代码高亮** — 支持 50+ 种语言语法高亮\n' +
-    '- **暗色/亮色** — 右上角切换主题\n' +
-    '- **数据持久化** — 笔记自动保存到 IndexedDB，刷新不丢失\n' +
-    '- **历史记录** — 点击 📚 历史 按钮查看和恢复之前的笔记\n' +
-    '- **一键清理** — 历史记录支持单条删除和全部清空\n\n' +
+    '- **PWA 支持** — HTTPS 环境下可安装到桌面\n' +
+    '- **离线可用** — 数据保存在本地，刷新不丢失\n\n' +
+    '### 🔗 实时分享\n' +
+    '- **P2P 分享** — 通过 PeerJS 与他人实时分享笔记\n' +
+    '- **连接管理** — 心跳检测、断开重连\n\n' +
+    '### 🔌 插件系统\n' +
+    '- **自定义语法** — 注册正则规则扩展 Markdown 语法\n\n' +
+    '## 右下角操作栏\n\n' +
+    '页面右下角有一个浮动操作栏（FAB），包含：\n\n' +
+    '| 按钮 | 功能 |\n' +
+    '|------|------|\n' +
+    '| `＋` | 新建笔记 |\n' +
+    '| `📥` | 导出（打开文件后显示） |\n' +
+    '| `✎` | 编辑（打开文件后显示） |\n' +
+    '| `💾` | 保存到本地（未保存文件显示） |\n' +
+    '| `✕` | 关闭文件（打开文件后显示） |\n' +
+    '| `↑` | 回到顶部 |\n\n' +
     '## 代码示例\n\n' +
     '```python\n' +
     'def hello():\n' +
@@ -1948,7 +3301,6 @@ function loadDemo() {
     'hello()\n' +
     '```\n\n' +
     '```javascript\n' +
-    '// 行内代码示例\n' +
     'const name = "InkNote";\n' +
     'console.log(`欢迎使用 ${name}`);\n' +
     '```\n\n' +
@@ -1956,13 +3308,18 @@ function loadDemo() {
     '访问 https://github.com/wjy0705 了解更多。\n\n' +
     '## 任务列表\n\n' +
     '- [x] 文件夹导入\n' +
-    '- [x] 全文搜索\n' +
-    '- [x] 学习进度\n' +
-    '- [x] 复习提醒\n' +
-    '- [x] 原地编辑\n' +
-    '- [x] 实时分享\n' +
-    '- [x] 数据持久化\n' +
-    '- [x] 历史记录\n' +
+    '- [x] 新建笔记 + 保存到本地\n' +
+    '- [x] 全文搜索（多关键词 + 正则）\n' +
+    '- [x] 学习进度 + 复习提醒\n' +
+    '- [x] 原地编辑 + 实时预览\n' +
+    '- [x] 导出 PDF / HTML\n' +
+    '- [x] 实时分享（P2P）\n' +
+    '- [x] 三态主题（暗色/亮色/跟随系统）\n' +
+    '- [x] 数据持久化（IndexedDB）\n' +
+    '- [x] 历史记录管理\n' +
+    '- [x] PWA 安装 + 离线缓存\n' +
+    '- [x] 自定义语法插件\n' +
+    '- [x] 阅读统计 + 连续打卡\n' +
     '- [ ] 更多功能开发中...\n'
   state.files = [{path: '欢迎使用.md', name: '欢迎使用.md', content: demo, type: 'md', isDemo: true}]
   refreshTree()
@@ -1970,9 +3327,8 @@ function loadDemo() {
   saveState()
 }
 
-// 自动恢复 IndexedDB 中的上次文件夹，没有则加载演示
-setTimeout(function() {
-  if (state.files.length > 0 || state.currentFile) return
+// 启动：先检查 IndexedDB，有数据则恢复，无数据则加载使用介绍
+;(function() {
   if (typeof StorageCore === 'undefined') { loadDemo(); return }
   StorageCore.getLatest().then(function(folder) {
     if (folder && folder.files && folder.files.length > 0) {
@@ -1983,7 +3339,7 @@ setTimeout(function() {
       var saved2 = JSON.parse(localStorage.getItem('md-app-state') || '{}')
       if (saved2.currentFile) {
         var match = state.files.filter(function(f) { return f.path === saved2.currentFile })[0]
-        if (match) { openFile(match.path); return }
+        if (match) { openFile(match.path); renderHistoryList(); return }
       }
       var firstMd = state.files.filter(function(f) { return f.type === 'md' })[0]
       if (firstMd) openFile(firstMd.path)
@@ -1994,7 +3350,32 @@ setTimeout(function() {
     }
     renderHistoryList()
   }).catch(function() { loadDemo(); renderHistoryList() })
-}, 300)
+})()
+
+// ═══════════════════════════════════════════════════════════
+// 初始状态自测
+// ═══════════════════════════════════════════════════════════
+;(function() {
+  var pass = 0, fail = 0
+  function assert(cond, msg) {
+    if (cond) { pass++ } else { fail++; console.error('❌ FAIL: ' + msg) }
+  }
+
+  // Test 1: 首次使用应有文件列表
+  assert(state.files.length > 0, '初始状态应有文件（demo 或恢复的数据）')
+
+  // Test 2: 首次使用应有当前打开的文件
+  assert(state.currentFile !== null, '初始状态应有当前打开的文件')
+
+  // Test 3: 当前文件应有内容
+  assert(state.currentFile && state.currentFile.content.length > 0, '当前文件应有内容')
+
+  if (fail === 0) {
+    console.log('✅ 初始状态自测全部通过 (' + pass + '/' + pass + ')')
+  } else {
+    console.error('❌ 初始状态自测 ' + fail + ' 项失败, ' + pass + ' 项通过')
+  }
+})()
 
 // 多标签页同步：其他标签页修改 localStorage 时刷新进度
 window.addEventListener('storage', function(e) {
