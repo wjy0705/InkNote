@@ -528,8 +528,8 @@ html[data-theme="light"] .icon-folder{background-image:url("data:image/svg+xml,%
     <div class="progress-header">
       <span>学习进度</span>
       <div style="display:flex;gap:4px">
-        <button class="collapse-btn" onclick="exportProgress()" title="导出进度">📥</button>
-        <button class="collapse-btn" onclick="document.getElementById('importInput').click()" title="导入进度">📤</button>
+        <button class="collapse-btn" onclick="exportProgress(event)" title="导出进度">📥</button>
+        <button class="collapse-btn" onclick="event.stopPropagation();document.getElementById('importInput').click()" title="导入进度">📤</button>
         <input type="file" id="importInput" accept=".json" style="display:none" onchange="importProgress(event)">
         <button class="collapse-btn" id="collapseProgress">−</button>
       </div>
@@ -1634,7 +1634,7 @@ function downloadAsFile(content, fileName) {
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  setTimeout(function() { URL.revokeObjectURL(url) }, 200)
 }
 
 // 关闭未保存的新建文件时提示
@@ -1670,10 +1670,13 @@ function openFile(path) {
   var file = state.files.filter(function(f) { return f.path === path })[0]
   if (!file) return
   state.currentFile = file
-  // 高亮 tree
-  document.querySelectorAll('.tree-item').forEach(function(el) { el.classList.remove('active') })
-  var treeEl = document.querySelector('.tree-item[data-path="' + path.replace(/"/g,'\\"') + '"]')
-  if (treeEl) treeEl.classList.add('active')
+  // 高亮 tree（缓存 _activeTreeItem 避免每次 querySelectorAll）
+  if (state._activeTreeItem) {
+    state._activeTreeItem.classList.remove('active')
+    state._activeTreeItem = null
+  }
+  state._activeTreeItem = document.querySelector('.tree-item[data-path="' + path.replace(/\"/g,'\\"') + '"]')
+  if (state._activeTreeItem) state._activeTreeItem.classList.add('active')
 
   var contentEl = document.getElementById('content')
   document.getElementById('fileName').textContent = file.name
@@ -2194,14 +2197,17 @@ function updateProgressBar() {
 // ═══════════════════════════════════════════════════════════
 // 进度导出/导入
 // ═══════════════════════════════════════════════════════════
-function exportProgress() {
+function exportProgress(e) {
+  if (e) e.stopPropagation()
   var data = JSON.stringify(state.progress, null, 2)
   var blob = new Blob([data], {type: 'application/json'})
   var a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
   a.download = 'md学习进度_' + new Date().toISOString().slice(0,10) + '.json'
+  document.body.appendChild(a)
   a.click()
-  URL.revokeObjectURL(a.href)
+  document.body.removeChild(a)
+  setTimeout(function() { URL.revokeObjectURL(a.href) }, 200)
 }
 
 function importProgress(e) {
@@ -2436,7 +2442,18 @@ function setupScrollSpy() {
 // 回到顶部
 var backTopBtn = document.getElementById('backTop')
 backTopBtn.addEventListener('click', function() {
-  window.scrollTo({top: 0, behavior: 'smooth'})
+  // 自定义平滑滚动，使用 ease-out-cubic 替代原生 behavior:smooth
+  var startY = window.scrollY
+  var startTime = performance.now()
+  var duration = 500
+  function scrollEaseOutCubic(t) { return 1 - Math.pow(1 - t, 3) }
+  function scrollStep(now) {
+    var elapsed = now - startTime
+    var progress = Math.min(elapsed / duration, 1)
+    window.scrollTo(0, startY * (1 - scrollEaseOutCubic(progress)))
+    if (progress < 1) requestAnimationFrame(scrollStep)
+  }
+  requestAnimationFrame(scrollStep)
 })
 
 // ═══════════════════════════════════════════════════════════
@@ -2855,8 +2872,10 @@ function exportToHTML() {
   var a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
   a.download = state.currentFile.name.replace(/\.md$/i, '') + '.html'
+  document.body.appendChild(a)
   a.click()
-  URL.revokeObjectURL(a.href)
+  document.body.removeChild(a)
+  setTimeout(function() { URL.revokeObjectURL(a.href) }, 200)
   showToast('已导出 HTML', 'var(--green)')
 }
 

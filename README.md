@@ -1,4 +1,4 @@
-# 墨舟 InkNote v1.2
+# 墨舟 InkNote v1.3
 
 > 一款轻量、离线可用的 Markdown 学习助手 — 单 HTML 文件，零依赖，打开即用。
 
@@ -54,7 +54,7 @@
 
 全是纯前端原生技术，无框架依赖：
 
-- **语言**：HTML + CSS + JavaScript（~4400 行，单文件）
+- 语言：HTML + CSS + JavaScript（~4450 行，单文件）
 - **存储**：IndexedDB（文件持久化）+ localStorage（配置/进度/阅读统计/自定义规则）
 - **外置依赖（CDN）**：Prism.js 代码高亮、PeerJS P2P 分享
 - **离线能力**：首次加载后完全离线可用，所有数据存本地；PWA 安装到桌面
@@ -67,9 +67,18 @@
 
 参见 [UPGRADE.md](UPGRADE.md) 了解各版本修复详情。
 
-### v1.2（当前）
+### v1.3（当前）
 
-修复 3 个用户体验问题：
+修复 2 个异常场景，新增 2 个体验优化：
+
+- **进度导出按钮点击后面板关闭** — 事件冒泡导致面板消失，按钮添加 `stopPropagation`
+- **导出/下载偶发静默失败** — `URL.revokeObjectURL()` 过早释放，延迟 200ms 后回收
+- **侧边栏 active 切换缓存** — `_activeTreeItem` DOM 引用缓存，减少 `querySelectorAll` 遍历
+- **自定义平滑滚动** — `requestAnimationFrame` + `ease-out-cubic` 替代原生 `behavior: smooth`
+
+---
+
+### v1.2
 
 - **新建笔记编辑器未激活** — `createNewFile()` 跳过预览直接进入编辑模式
 - **保存流程优化** — `showSaveFilePicker` 一步选目录改文件名，不支持的浏览器走 fallback
