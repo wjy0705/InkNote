@@ -1,4 +1,4 @@
-# 墨舟 InkNote v1.3
+# 墨舟 InkNote v1.5
 
 > 一款轻量、离线可用的 Markdown 学习助手 — 单 HTML 文件，零依赖，打开即用。
 
