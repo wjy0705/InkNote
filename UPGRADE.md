@@ -2,7 +2,104 @@
 
 ---
 
-## v1.3（当前）
+## v1.5（当前）
+
+新增 AI 助手功能：可拖拽浮动按钮 + 可拖拽聊天面板 + 移动端底部抽屉定位。
+
+### 功能新增
+
+#### 1. AI 浮动按钮（`.ai-fab`）
+
+右下角灵眸图标按钮，可拖拽移动，点击展开/收起 AI 聊天面板。
+
+- **桌面端：** `bottom:90px; right:28px`，48x48px
+- **移动端（≤640px）：** `bottom:70px; right:16px`，44x44px
+- hover 放大 1.1x，active 缩小 0.95x
+- 拖拽状态 `dragging` 放大 1.05x + 强化阴影，过渡动画暂停
+
+#### 2. AI 聊天面板（`.ai-chat-panel`）
+
+固定定位的可拖拽聊天窗口，含顶部拖拽栏、消息区、输入框、发送按钮、打字动画。
+
+**桌面端定位：**
+- `top: calc(var(--header-h) + 20px); right: 20px`
+- 380px 宽，max-height 100vh-80px
+- 可拖拽移动（拖拽头 `#aiChatHeader`）
+- z-index: 96（高于进度面板，低于分享弹窗）
+
+**移动端（≤640px）底部抽屉：**
+```css
+.ai-chat-panel {
+  width: calc(100vw - 16px);
+  right: 8px !important;
+  left: 8px !important;
+  bottom: 8px !important;
+  top: auto !important;
+  max-height: 70vh;
+  border-radius: 12px;
+}
+```
+
+**极小屏（≤480px）进一步收窄：**
+```css
+.ai-chat-panel {
+  width: calc(100vw - 12px) !important;
+  right: 6px !important;
+  left: 6px !important;
+  bottom: 6px !important;
+  max-height: 75vh;
+  border-radius: 10px;
+}
+```
+
+#### 3. 交互细节
+
+- 面板打开/关闭动画：`modalPopIn` 0.25s 弹性曲线
+- 消息区：`ai-messages` 自动滚动到底部，最小高度 150px
+- 输入框：`ai-input-row textarea` 自动调整高度
+- 打字动画：三个点 `.ai-typing` 使用 `aiTypingDot` 错帧动画
+- 发送按钮：渐变背景 `linear-gradient(135deg, #7b93ff, #5a7aff)`
+
+#### 4. 主题兼容
+
+所有 AI 相关 CSS 变量均使用 `:root` / `[data-theme="light"]` 定义，亮暗切换无样式断裂。
+
+### 自测验证
+
+| 测试 | 验证内容 | 状态 |
+|------|---------|:----:|
+| AI FAB 显示/隐藏 | 点击切换面板，FAB 保持可见 | ✓ |
+| FAB 拖拽 | 按住拖拽后释放，位置不还原 | ✓ |
+| AI 面板桌面定位 | 右上角固定，top 在 header 下方 | ✓ |
+| AI 面板移动端定位 | ≤640px 底部抽屉，≤480px 更窄边距 | ✓ |
+| 面板拖拽 | 拖拽头后面板跟随移动 | ✓ |
+| 消息发送/展示 | 输入文字发送后消息区显示 | ✓ |
+| 打字动画 | AI 回复时三点动画持续 | ✓ |
+| 亮暗切换 | 面板背景/文字/按钮颜色正确切换 | ✓ |
+
+---
+
+## v1.4
+
+修复 1 个异常场景和删除 1 个功能遮罩。
+
+### 1. 移动端进度面板 toggle 按钮无响应
+
+**问题：** 移动端点击「≡」按钮时，进度面板打开后立即关闭。
+
+**原因：** 事件冒泡导致 `document` 上的 click handler 检测到点击不在面板外部但点击到了 toggle 按钮 → 先打开 → 然后 document handler 关闭面板。
+
+**修复：** toggle 按钮的 click 事件添加 `event.stopPropagation()` 阻止冒泡到 document。
+
+**改动位置：** 第 4523 行
+
+### 2. 删除功能遮罩
+
+去掉了一个功能按钮的盖板 CSS。
+
+---
+
+## v1.3
 
 修复 2 个 bug，新增 2 个体验优化。
 
